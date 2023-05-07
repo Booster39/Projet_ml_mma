@@ -39,6 +39,12 @@ fn put_image_in_array() {
     let mut matrix: Vec<Vec<T>> = Vec::new();
     matrix.push(vec![p1, p2, p3]);
     matrix.push(vec![p4, p5, p6]);
+    //But : On ne veut pas seulement 3 éléments par vecteurs mais on en veut 30. Pour cela
+    //le mieux est de faire une boucle for qui ajoute chaque élément un par un. (avec push)
+    // -> Problème : après avoir rempli le 1er vec -> les éléments s'affichent en colonnes et pas en lignes
+
+    //Donc après le 1 er vec, on utilise transpose pour que le 1er vec corresponde à la 1re ligne
+    //On effectue la même opération pour le 2ème vec
 
     // Afficher le contenu du vecteur
     println!("{:?}", matrix);
