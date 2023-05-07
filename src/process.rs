@@ -4,20 +4,46 @@ use std::path::Path;
 
 fn load_and_preprocess_image(image_path: &str, output_size: (usize, usize)) -> Array3<f32> {
     // Charger une image à partir d'un fichier
+    // let img = image::open("image.png").unwrap();
     let img = image::open(&Path::new(image_path)).unwrap();
 
-    // Convertir l'image en RVB et la redimensionner
-    let resized_img = img.resize_exact(output_size.0 as u32, output_size.1 as u32, image::imageops::FilterType::Nearest);
+    // Convertir l'image en tableau ndarray
+    let mut img_data: Vec<u8> = img.raw_pixels();
+    let img_ndarray = Array::from_shape_vec((img.height() as usize, img.width() as usize, img.color().channel_count() as usize), img_data).unwrap();
 
-    // Convertir l'image en tableau et normaliser les pixels
-    let img_array = Array3::from_shape_fn((output_size.0, output_size.1, 3), |(i, j, c)| {
-        resized_img.get_pixel(i as u32, j as u32)[c] as f32 / 255.0
-    });
+    // Réduire la taille de l'image
+    let resized_img_ndarray = imageops::resize(&img_ndarray, 100, 100, imageops::FilterType::Triangle);
 
-    // Soustraire la moyenne et diviser par l'écart-type
-    let mean: f32 = img_array.iter().sum::<f32>() / img_array.len() as f32;
-    let std: f32 = (img_array.iter().map(|x| (x - mean).powi(2)).sum::<f32>() / img_array.len() as f32).sqrt();
-    let norm_img_array = (img_array - mean) / std;
+    // Normaliser les valeurs des pixels
+    let normalized_img_ndarray = (resized_img_ndarray.mapv(|x| x as f32 / 255.0) - 0.5) * 2.0;
 
-    norm_img_array
+    // Convertir le tableau ndarray en vecteur
+    let mut normalized_img_data: Vec<f32> = Vec::new();
+    normalized_img_ndarray.iter().for_each(|&x| normalized_img_data.push(x));
+
+    // Utiliser le vecteur pour entraîner un modèle de machine learning
+    // ...
+    return normalized_img_data;
 }
+
+fn put_image_in_array() {
+    // Créer un vecteur de deux lignes où chaque élément est un vecteur
+    let mut matrix: Vec<f32> = Vec::new();
+    for conor in 0..30 {
+        normalized_img_data.push(conor);
+    }
+    for tyson in 0..30 {
+        normalized_img_data.push(tyson);
+    }
+
+    let mut matrix: Vec<Vec<T>> = Vec::new();
+    matrix.push(vec![p1, p2, p3]);
+    matrix.push(vec![p4, p5, p6]);
+
+    // Afficher le contenu du vecteur
+    println!("{:?}", matrix);
+}//1 et -1 sur photo -> tous les labels (Y_train)
+//X_train 
+
+//0 1 2 3 4 5
+//6 7 8 9 0 0
