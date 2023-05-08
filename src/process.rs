@@ -2,7 +2,7 @@ use image::{DynamicImage, GenericImageView};
 use ndarray::prelude::*;
 use std::path::Path;
 
-fn load_and_preprocess_image(image_path: &str, output_size: (usize, usize)) -> Array3<f32> {
+fn load_and_preprocess_image(image_path: &str) -> Vec<f32> {
     // Charger une image à partir d'un fichier
     // let img = image::open("image.png").unwrap();
     let img = image::open(&Path::new(image_path)).unwrap();
@@ -36,19 +36,33 @@ fn put_image_in_array() {
         normalized_img_data.push(tyson);
     }
 
-    let mut matrix: Vec<Vec<T>> = Vec::new();
-    matrix.push(vec![p1, p2, p3]);
-    matrix.push(vec![p4, p5, p6]);
+    let mut matrix: Vec<Vec<T>> = Vec::new(); 
+    for i in 1..31 {
+        let mut link: String = "./dataset/conor_mcgregor/";
+        link.push(i.to_string());
+        matrix.push(load_and_preprocess_image(link))
+    }
+    matrix.transpose();
+    let mut vector: Vec<Vec<T>> = Vec::new(); 
+    for i in 1..29 {
+        let mut link: String = "./dataset/mike_tyson/";
+        link.push(i.to_string());
+        vector.push(load_and_preprocess_image(link))
+    }
+    vector.transpose();
+    matrix.push(vector[0]);
+
+    //PROBLEME RESOLU !!!!!!!
     //But : On ne veut pas seulement 3 éléments par vecteurs mais on en veut 30. Pour cela
     //le mieux est de faire une boucle for qui ajoute chaque élément un par un. (avec push)
-    // -> Problème : après avoir rempli le 1er vec -> les éléments s'affichent en colonnes et pas en lignes
-
+    //-> Problème : après avoir rempli le 1er vec -> les éléments s'affichent en colonnes et pas en lignes
     //Donc après le 1 er vec, on utilise transpose pour que le 1er vec corresponde à la 1re ligne
     //On effectue la même opération pour le 2ème vec
 
     // Afficher le contenu du vecteur
     println!("{:?}", matrix);
-}//1 et -1 sur photo -> tous les labels (Y_train)
+}
+//1 et -1 sur photo -> tous les labels (Y_train)
 //X_train 
 
 //0 1 2 3 4 5
