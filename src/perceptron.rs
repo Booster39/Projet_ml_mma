@@ -1,4 +1,8 @@
 use rand::Rng;
+use rand::SeedableRng;
+use rand::rngs::StdRng;
+
+
 
 pub(crate) struct MyMLP {
     d: Vec<usize>,
@@ -14,6 +18,11 @@ impl MyMLP {
         let L = npl.len() - 1;
         let mut W = Vec::new();
 
+        let seed: [u8; 32] = [1; 32];
+
+        // Créer un générateur de nombres aléatoires avec la graine fixe
+        let mut rng: StdRng = SeedableRng::from_seed(seed);
+
         for l in 0..=L {
             W.push(Vec::new());
 
@@ -24,7 +33,7 @@ impl MyMLP {
             for _i in 0..=npl[l - 1] {
                 W[l].push(Vec::new());
                 for j in 0..=npl[l] {
-                    W[l][_i].push(if j == 0 { 0.0 } else { rand::thread_rng().gen_range(-1.0..=1.0) });
+                    W[l][_i].push(if j == 0 { 0.0 } else { rng.gen_range(-1.0..=1.0) });
                 }
             }
         }
@@ -54,7 +63,19 @@ impl MyMLP {
         }
     }
 
-    pub(crate) fn _propagate(&mut self, inputs: &[f64], is_classification: bool) {
+    pub(crate) fn sigmoid(x: f64) -> f64 {
+        1.0 / (1.0 + (-x).exp())
+    }
+
+    pub(crate) fn threshold(x: f64) -> f64 {
+        if x >= 0.5 {
+            1.0
+        } else {
+            0.0
+        }
+    }
+
+    pub(crate) fn _propagate(&mut self, inputs: &[f64], is_classification: bool, activation_fn: fn(f64) -> f64) {
         for j in 0..self.d[0] {
             self.X[0][j + 1] = inputs[j];
         }
@@ -67,18 +88,20 @@ impl MyMLP {
                 }
 
                 if l < self.L || is_classification {
-                    total = total.tanh();
+                    total = activation_fn(total);
                 }
+
 
                 self.X[l][j] = total;
             }
         }
     }
 
-    pub(crate) fn predict(&mut self, inputs: &[f64], is_classification: bool) -> Vec<f64> {
-        self._propagate(inputs, is_classification);
+    pub(crate) fn predict(&mut self, inputs: &[f64], is_classification: bool, activation_fn: fn(f64) -> f64) -> Vec<f64> {
+        self._propagate(inputs, is_classification, activation_fn);
         self.X[self.L][1..].to_vec()
     }
+
 
 
     pub(crate) fn train(
@@ -88,13 +111,14 @@ impl MyMLP {
         is_classification: bool,
         iteration_count: usize,
         alpha: f64,
+        activation_fn: fn(f64) -> f64,
     ) {
         for _ in 0..iteration_count {
             let k = rand::thread_rng().gen_range(0..all_samples_inputs.len());
             let inputs_k = &all_samples_inputs[k];
             let y_k = &all_samples_expected_outputs[k];
 
-            self._propagate(inputs_k, is_classification);
+            self._propagate(inputs_k, is_classification, activation_fn);
 
             for j in 1..=self.d[self.L] {
                 self.deltas[self.L][j] = self.X[self.L][j] - y_k[j - 1];

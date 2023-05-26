@@ -3,7 +3,7 @@ use perceptron::{MyMLP};
 
 fn main() {
     let mut mlp = MyMLP::new(vec![2, 0, 1]);
-    mlp._propagate(&[0.0, 0.0], false);
+    mlp._propagate(&[0.0, 0.0], false, MyMLP::sigmoid);
     println!("{:?}", mlp.X);
 
     let mut test_1_all_samples_inputs: Vec<Vec<f64>> = vec![
@@ -14,19 +14,20 @@ fn main() {
 
     let test_1_all_samples_expected_outputs: Vec<Vec<f64>> = vec![
         vec![1.0],
-        vec![-1.0],
-        vec![-1.0]
+        vec![0.0],
+        vec![0.0]
     ];
+
 
     // Afficher les résultats avant l'entraînement
     println!("Résultats avant l'entraînement :");
     for inputs in &test_1_all_samples_inputs {
-        let predictions = mlp.predict(inputs, false);
+        let predictions = mlp.predict(inputs, false, MyMLP::sigmoid);
         println!("Entrées : {:?} | Prédictions : {:?}", inputs, predictions);
     }
 
     //train
-    let layer_sizes = vec![2, 0, 1];
+    let layer_sizes = vec![3, 4, 1];
     let mut train = MyMLP::new(layer_sizes);
     let all_samples_inputs: Vec<Vec<f64>> = test_1_all_samples_inputs.clone();
     let all_samples_expected_outputs: Vec<Vec<f64>> = test_1_all_samples_expected_outputs;
@@ -40,12 +41,13 @@ fn main() {
         is_classification,
         iteration_count,
         alpha,
+        MyMLP::sigmoid,
     );
 
     // Afficher les résultats après l'entraînement
     println!("Résultats après l'entraînement :");
     for inputs in &test_1_all_samples_inputs {
-        let predictions = mlp.predict(inputs, false);
+        let predictions = mlp.predict(&inputs, is_classification, MyMLP::sigmoid);
         println!("Entrées : {:?} | Prédictions : {:?}", inputs, predictions);
     }
 }
