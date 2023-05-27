@@ -8,3 +8,4 @@ opencv = "0.80.0"
 
 [dependencies]
 rand = "0.8"
+rusty-machine = "0.5.4"
