@@ -1,5 +1,5 @@
 use std::path::Path;
-use ndarray::{Array3, ArrayViewMut3, s};
+use ndarray::{Array3, Array2, Array1, ArrayViewMut3, s};
 use image::{DynamicImage, GenericImageView, Pixel};
 
 
@@ -30,6 +30,40 @@ fn load_and_preprocess_image(image_path: &str) -> Array3<f32> {
 
     img_ndarray
 }
+
+
+fn put_images_in_vector() {
+    // Créer un vecteur de 2 lignes
+    let mut vector: Vec<Array3<f32>> = Vec::with_capacity(2);
+
+    // Créer 17 tableaux ndarray par ligne
+    for _ in 0..2 {
+        let mut line: Array2<f32> = Array2::zeros((17, 1));
+        let mut arrays: Vec<Array3<f32>> = Vec::with_capacity(17);
+
+        for _ in 0..17 {
+            let array: Array3<f32> = Array3::zeros((1, 1, 1));
+            arrays.push(array);
+        }
+
+        line.assign(&arrays);
+        vector.push(line);
+    }
+
+    // Afficher le vecteur
+    for (i, line) in vector.iter().enumerate() {
+        println!("Ligne {}: {:?}", i, line);
+    }
+}
+
+fn main() {
+    let image_path = "C:/Users/abdoulaye.doucoure/Desktop/Projet_ml_mma/dataset/conor_mcgregor/1.jpg";
+    let preprocessed_image = load_and_preprocess_image(image_path);
+    put_images_in_vector();
+}
+
+
+
 
 /*fn main() {
     let image_path = "C:/Users/abdoulaye.doucoure/Desktop/Projet_ml_mma/dataset/conor_mcgregor/1.jpg";
