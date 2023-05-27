@@ -4,16 +4,16 @@ use image::{DynamicImage, GenericImageView, Pixel};
 
 
 pub fn load_and_preprocess_image(image_path: &str) -> Array3<f32> {
-    // Load the image from the file
+    // Permet d'ouvrire l'image et de la charger en mémoire
     let img = image::open(&Path::new(image_path)).expect("Failed to open image");
 
-    // Convert the image to a dynamic image for resizing
+    // Charge l'image dynamiquement dans la mémoire
     let dyn_img: DynamicImage = img.into();
 
-    // Resize the image
-    let resized_img = dyn_img.resize_exact(30, 30, image::imageops::Triangle);
+    // Resize the image to 32x32 pixels
+    let resized_img = dyn_img.resize_exact(32, 32, image::imageops::Triangle);
 
-    // Convert the resized image to an ndarray array
+    // Division de l'image en 1 tableau de 3 dimensions
     let (width, height) = resized_img.dimensions();
     let mut img_ndarray = Array3::<f32>::zeros((height as usize, width as usize, 3));
     resized_img.pixels().for_each(|(x, y, pixel)| {

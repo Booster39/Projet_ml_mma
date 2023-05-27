@@ -5,7 +5,7 @@ use process::*;
 
 fn main() {
 
-    // Loading and preprocess images
+    // Test avec une image
     let image_path = "dataset/conor_mcgregor/1.jpg";
     load_and_preprocess_image(image_path);
     println!();
