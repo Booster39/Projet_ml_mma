@@ -5,13 +5,14 @@ use process::*;
 
 fn main() {
 
+    // Loading and preprocess images
     let image_path = "dataset/conor_mcgregor/1.jpg";
     load_and_preprocess_image(image_path);
     println!();
     println!();
     println!();
 
-    
+    // Training of the model
     let mut mlp = MyMLP::new(vec![2, 0, 1]);
     mlp._propagate(&[0.0, 0.0], false, MyMLP::sigmoid);
     println!("{:?}", mlp.X);
