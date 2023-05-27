@@ -3,17 +3,17 @@ use ndarray::{Array3, Array2, Array1, ArrayViewMut3, s};
 use image::{DynamicImage, GenericImageView, Pixel};
 
 
-fn load_and_preprocess_image(image_path: &str) -> Array3<f32> {
-    // Charger l'image à partir de son fichier
+pub fn load_and_preprocess_image(image_path: &str) -> Array3<f32> {
+    // Load the image from the file
     let img = image::open(&Path::new(image_path)).expect("Failed to open image");
 
-    // Convertir l'image en image dynamique pour la redimensionner
+    // Convert the image to a dynamic image for resizing
     let dyn_img: DynamicImage = img.into();
 
-    // Redimensionne limage
-    let resized_img = dyn_img.resize_exact(100, 100, image::imageops::Triangle);
+    // Resize the image
+    let resized_img = dyn_img.resize_exact(30, 30, image::imageops::Triangle);
 
-    // Convertis l'image redimensionné en tableau ndarray
+    // Convert the resized image to an ndarray array
     let (width, height) = resized_img.dimensions();
     let mut img_ndarray = Array3::<f32>::zeros((height as usize, width as usize, 3));
     resized_img.pixels().for_each(|(x, y, pixel)| {
@@ -23,16 +23,24 @@ fn load_and_preprocess_image(image_path: &str) -> Array3<f32> {
             channels[1] as f32 / 255.0,
             channels[2] as f32 / 255.0,
         ];
-        let pixel_array = Array3::from_shape_vec((1, 1, 3), pixel_value.to_vec()).unwrap();
+        let pixel_array = ndarray::array![pixel_value].into_shape((3)).unwrap();
         let mut view = img_ndarray.slice_mut(s![y as usize, x as usize, ..]);
         view.assign(&pixel_array);
     });
+
+    println!("Valeurs de img_ndarray:");
+    for row in img_ndarray.outer_iter() {
+        for pixel in row.iter() {
+            print!("{:?} ", pixel);
+        }
+        println!();
+    }
 
     img_ndarray
 }
 
 
-fn put_images_in_vector() {
+/*pub fn put_images_in_vector() {
     // Créer un vecteur de 2 lignes
     let mut vector: Vec<Array3<f32>> = Vec::with_capacity(2);
 
@@ -54,13 +62,14 @@ fn put_images_in_vector() {
     for (i, line) in vector.iter().enumerate() {
         println!("Ligne {}: {:?}", i, line);
     }
-}
+}*/
 
-fn main() {
+/*fn main() {
     let image_path = "C:/Users/abdoulaye.doucoure/Desktop/Projet_ml_mma/dataset/conor_mcgregor/1.jpg";
-    let preprocessed_image = load_and_preprocess_image(image_path);
-    put_images_in_vector();
-}
+    load_and_preprocess_image(image_path);
+    //let preprocessed_image = load_and_preprocess_image(image_path);
+    //put_images_in_vector();
+}*/
 
 
 
