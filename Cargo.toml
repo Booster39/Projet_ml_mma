@@ -8,4 +8,9 @@ opencv = "0.80.0"
 
 [dependencies]
 rand = "0.8"
+<<<<<<< HEAD
 rusty-machine = "0.5.4"
+=======
+ndarray = "0.15.4"
+image = "0.23.14"
+>>>>>>> 1b99c7dbefc2e75972f2656bd668b0e163e558b5

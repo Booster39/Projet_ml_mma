@@ -1,12 +1,26 @@
 mod perceptron;
+<<<<<<< HEAD
 mod modelelineaire;
 
 use perceptron::MyMLP;
 use modelelineaire::LinRegressor;
 use rusty_machine::linalg::Matrix;
 use rusty_machine::linalg::Vector;
+=======
+mod process;
+use perceptron::{MyMLP};
+use process::*;
+>>>>>>> 1b99c7dbefc2e75972f2656bd668b0e163e558b5
 
 fn main() {
+
+    // Test avec une image
+    put_image_in_array();
+    println!();
+    println!();
+    println!();
+
+    // Training of the model
     let mut mlp = MyMLP::new(vec![2, 0, 1]);
     mlp._propagate(&[0.0, 0.0], false, MyMLP::sigmoid);
     println!("{:?}", mlp.X);
