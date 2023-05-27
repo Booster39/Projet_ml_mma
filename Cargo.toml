@@ -8,3 +8,5 @@ opencv = "0.80.0"
 
 [dependencies]
 rand = "0.8"
+ndarray = "0.15.4"
+image = "0.23.14"

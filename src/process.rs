@@ -1,32 +1,48 @@
-use image::{DynamicImage, GenericImageView};
-use ndarray::prelude::*;
 use std::path::Path;
+use ndarray::{Array3, ArrayViewMut3, s};
+use image::{DynamicImage, GenericImageView, Pixel};
 
-fn load_and_preprocess_image(image_path: &str) -> Vec<f32> {
-    // Charger une image à partir d'un fichier
-    // let img = image::open("image.png").unwrap();
-    let img = image::open(&Path::new(image_path)).unwrap();
 
-    // Convertir l'image en tableau ndarray
-    let mut img_data: Vec<u8> = img.raw_pixels();
-    let img_ndarray = Array::from_shape_vec((img.height() as usize, img.width() as usize, img.color().channel_count() as usize), img_data).unwrap();
+fn load_and_preprocess_image(image_path: &str) -> Array3<f32> {
+    // Charger l'image à partir de son fichier
+    let img = image::open(&Path::new(image_path)).expect("Failed to open image");
 
-    // Réduire la taille de l'image
-    let resized_img_ndarray = imageops::resize(&img_ndarray, 100, 100, imageops::FilterType::Triangle);
+    // Convertir l'image en image dynamique pour la redimensionner
+    let dyn_img: DynamicImage = img.into();
 
-    // Normaliser les valeurs des pixels
-    let normalized_img_ndarray = (resized_img_ndarray.mapv(|x| x as f32 / 255.0) - 0.5) * 2.0;
+    // Redimensionne limage
+    let resized_img = dyn_img.resize_exact(100, 100, image::imageops::Triangle);
 
-    // Convertir le tableau ndarray en vecteur
-    let mut normalized_img_data: Vec<f32> = Vec::new();
-    normalized_img_ndarray.iter().for_each(|&x| normalized_img_data.push(x));
+    // Convertis l'image redimensionné en tableau ndarray
+    let (width, height) = resized_img.dimensions();
+    let mut img_ndarray = Array3::<f32>::zeros((height as usize, width as usize, 3));
+    resized_img.pixels().for_each(|(x, y, pixel)| {
+        let channels = pixel.channels();
+        let pixel_value: [f32; 3] = [
+            channels[0] as f32 / 255.0,
+            channels[1] as f32 / 255.0,
+            channels[2] as f32 / 255.0,
+        ];
+        let pixel_array = Array3::from_shape_vec((1, 1, 3), pixel_value.to_vec()).unwrap();
+        let mut view = img_ndarray.slice_mut(s![y as usize, x as usize, ..]);
+        view.assign(&pixel_array);
+    });
 
-    // Utiliser le vecteur pour entraîner un modèle de machine learning
-    // ...
-    return normalized_img_data;
+    img_ndarray
 }
 
-fn put_image_in_array() {
+/*fn main() {
+    let image_path = "C:/Users/abdoulaye.doucoure/Desktop/Projet_ml_mma/dataset/conor_mcgregor/1.jpg";
+    let preprocessed_image = load_and_preprocess_image(image_path);
+
+    // Use the preprocessed image for machine learning
+    // ...
+}
+
+main()
+*/
+
+/*fn put_image_in_array() {
     // Créer un vecteur de deux lignes où chaque élément est un vecteur
     let mut matrix: Vec<f32> = Vec::new();
     for conor in 0..30 {
@@ -67,3 +83,4 @@ fn put_image_in_array() {
 
 //0 1 2 3 4 5
 //6 7 8 9 0 0
+*/
