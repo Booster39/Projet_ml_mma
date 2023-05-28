@@ -1,16 +1,11 @@
 mod perceptron;
-<<<<<<< HEAD
-mod modelelineaire;
+mod modele_lineaire;
+mod process;
 
 use perceptron::MyMLP;
-use modelelineaire::LinRegressor;
-use rusty_machine::linalg::Matrix;
-use rusty_machine::linalg::Vector;
-=======
-mod process;
-use perceptron::{MyMLP};
+use modele_lineaire::LinRegressor;
+use rusty_machine::linalg::{Matrix, Vector};
 use process::*;
->>>>>>> 1b99c7dbefc2e75972f2656bd668b0e163e558b5
 
 fn main() {
 
