@@ -67,6 +67,10 @@ impl MyMLP {
         1.0 / (1.0 + (-x).exp())
     }
 
+    pub(crate) fn tanh(x: f64) -> f64 {
+        x.tanh()
+    }
+
     pub(crate) fn threshold(x: f64) -> f64 {
         if x >= 0.5 {
             1.0
