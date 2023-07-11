@@ -1,9 +1,7 @@
 mod perceptron;
-mod modele_lineaire;
 mod process;
 
 use perceptron::MyMLP;
-use modele_lineaire::LinRegressor;
 use rusty_machine::linalg::{Matrix, Vector};
 use process::*;
 
@@ -22,8 +20,8 @@ fn main() {
 
     let mut test_1_all_samples_inputs: Vec<Vec<f64>> = vec![
         vec![0.0, 0.0],
-        vec![0.0, 1.0],
-        vec![1.0, 0.0]
+        vec![0.0, -1.0],
+        vec![1.0, -1.0]
     ];
 
     let test_1_all_samples_expected_outputs: Vec<Vec<f64>> = vec![
