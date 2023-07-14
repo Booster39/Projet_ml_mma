@@ -1,9 +1,7 @@
 mod perceptron;
-mod modele_lineaire;
 mod process;
 
 use perceptron::MyMLP;
-use modele_lineaire::LinRegressor;
 use rusty_machine::linalg::{Matrix, Vector};
 use process::*;
 use rand::Rng;
@@ -22,6 +20,7 @@ fn main() {
     mlp._propagate(&[0.0, 0.0], false, MyMLP::tanh);
     println!("{:?}", mlp.X);
 
+    
     let mut test_1_all_samples_inputs: Vec<Vec<f64>> = Vec::new();
     let input_count = 1;  // Nombre d'échantillons d'entrée
     let input_base = -1;  // Valeur minimale des échantillons d'entrée
