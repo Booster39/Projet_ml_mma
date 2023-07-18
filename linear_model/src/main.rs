@@ -44,43 +44,36 @@ impl Perceptron {
 }
 
 fn main() {
-
     let inputs: Vec<Vec<f64>> = vec![
-    vec![0.2, 0.3],
-    vec![0.4, 0.1],
-    vec![0.6, 0.7]];
-
-    let targets: Vec<f64> = vec![
-        1.0,
-        0.0,
-        1.0];
-
+        vec![0.2, 0.3],
+        vec![0.4, 0.1],
+        vec![0.6, 0.7],
+    ];
+    let targets: Vec<f64> = vec![1.0, 0.0, 1.0];
 
     let mut perceptron = Perceptron::new(2);
     perceptron.train(&inputs, &targets, 10);
 
-    let mut predicted_labels = Vec::new();
-    let mut predicted_x1 = Vec::new();
-    let mut predicted_x2 = Vec::new();
+    let test_inputs: Vec<Vec<f64>> = vec![
+        vec![0.1, 0.4],
+        vec![0.3, 0.2],
+        vec![0.5, 0.6],
+    ];
+    let test_targets: Vec<f64> = vec![1.0, 0.0, 1.0];
 
-    for x1 in 0..100 {
-        for x2 in 0..100 {
-            let x1_normalized = x1 as f64 / 100.0;
-            let x2_normalized = x2 as f64 / 100.0;
+    let mut correct_predictions = 0;
 
-            predicted_x1.push(x1_normalized);
-            predicted_x2.push(x2_normalized);
+    for i in 0..test_inputs.len() {
+        let prediction =
+            test_inputs[i][0] * perceptron.weights[1] + test_inputs[i][1] * perceptron.weights[2] + perceptron.weights[0];
+        let target = test_targets[i];
 
-            let prediction = x1_normalized * perceptron.weights[1] + x2_normalized * perceptron.weights[2] + perceptron.weights[0];
-            let label = if prediction >= 0.0 { "pink" } else { "lightskyblue" };
-
-            predicted_labels.push(label);
+        if (prediction >= 0.0 && target == 1.0) || (prediction < 0.0 && target == 0.0) {
+            correct_predictions += 1;
         }
     }
-    for i in 0..predicted_x1.len() {
-        println!(
-            "x1: {:.2}, x2: {:.2}, label: {}",
-            predicted_x1[i], predicted_x2[i], predicted_labels[i]
-        );
-    }
+
+    let accuracy = correct_predictions as f64 / test_inputs.len() as f64;
+    println!("Accuracy: {:.2}", accuracy);
 }
+

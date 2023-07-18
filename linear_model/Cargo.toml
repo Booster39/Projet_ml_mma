@@ -1,5 +1,5 @@
 [package]
-name = "Linear_modele"
+name = "linear_modele"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,7 @@ edition = "2021"
 
 [dependencies]
 rand = { version = "0.8" }
+
+[lib]
+crate-type = ["cdylib"]
+path = "src/ml_roseblatt.rs"
