@@ -132,12 +132,103 @@ pub extern "C" fn loadModel() -> *mut MLP {
     mlp
 }
 
+#[no_mangle]
+pub extern "C" fn propagate(mlp: *mut MLP, inputs: *const f64, is_classification: bool) {
+    unsafe {
+        for i in 0..(*mlp).d[0] as usize {
+            (*mlp).x[0][i] = *inputs.add(i);
+        }
+
+        (*mlp).x[0][(*mlp).d[0] as usize] = 1.0;
+
+        for i in 1..=(*mlp).l as usize {
+            for j in 0..(*mlp).d[i] as usize {
+                let mut sum = 0.0;
+
+                for k in 0..=(*mlp).d[i - 1] as usize {
+                    sum += (*mlp).w[i - 1][j][k] * (*mlp).x[i - 1][k];
+                }
+
+                (*mlp).x[i][j] = 1.0 / (1.0 + f64::exp(-sum));
+            }
+
+            if i != (*mlp).l as usize || !is_classification {
+                (*mlp).x[i][(*mlp).d[i] as usize] = 1.0;
+            }
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn train(mlp: *mut MLP, samples_inputs: *const f64, samples_expected_outputs: *const f64,
+                        samples_size: i32, inputs_size: i32, outputs_size: i32,
+                        is_classification: bool, iteration_count: i32, alpha: f64) {
+    unsafe {
+        let mut loss = 0.0;
+        let mut accuracy = 0.0;
+
+        for i in 0..iteration_count {
+            let index = (rand::random::<usize>() % samples_size as usize) as usize;
+            let input_ptr = samples_inputs.add((index * inputs_size as usize) as usize);
+            propagate(mlp, input_ptr, is_classification);
+
+            for j in 0..outputs_size as usize {
+                let delta = (*samples_expected_outputs.add((index * outputs_size as usize + j) as usize) - (*mlp).x[(*mlp).l as usize][j])
+                    * (*mlp).x[(*mlp).l as usize][j] * (1.0 - (*mlp).x[(*mlp).l as usize][j]);
+                (*mlp).deltas[(*mlp).l as usize - 1][j] = delta;
+                loss += f64::powf(*samples_expected_outputs.add(index * outputs_size as usize + j) - (*mlp).x[(*mlp).l as usize][j], 2.0);
+
+                if is_classification {
+                    if f64::round((*mlp).x[(*mlp).l as usize][j]) == *samples_expected_outputs.add(index * outputs_size as usize + j) {
+                        accuracy += 1.0;
+                    }
+                }
+            }
+
+            for j in (0..(*mlp).l as usize).rev() {
+                for k in 0..(*mlp).d[j] as usize {
+                    let mut sum = 0.0;
+
+                    for l in 0..(*mlp).d[j + 1] as usize {
+                        sum += (*mlp).w[j][l][k] * (*mlp).deltas[j + 1][l];
+                    }
+
+                    (*mlp).deltas[j][k] = sum * (*mlp).x[j + 1][k] * (1.0 - (*mlp).x[j + 1][k]);
+                }
+            }
+
+            for j in 0..(*mlp).l as usize {
+                for k in 0..(*mlp).d[j + 1] as usize {
+                    for l in 0..(*mlp).d[j] as usize {
+                        if l == (*mlp).d[j] as usize - 1 {
+                            (*mlp).w[j][k][l] += alpha * (*mlp).deltas[j][k];
+                        } else {
+                            (*mlp).w[j][k][l] += alpha * (*mlp).deltas[j][k] * (*mlp).x[j][l];
+                        }
+                    }
+                }
+            }
+
+            if i % 500 == 0 {
+                loss = loss / (outputs_size as f64 * 500.0);
+                accuracy = accuracy / (outputs_size as f64 * 500.0);
+                println!("Iteration {}: Loss = {:.4}, Accuracy = {:.2}%", i, loss, accuracy * 100.0);
+                loss = 0.0;
+                accuracy = 0.0;
+            }
+        }
+        saveModel(mlp);
+    }
+}
+
 
 #[no_mangle]
 pub extern "C" fn deleteMLP(mlp: *mut MLP) {
     unsafe {
-        if !mlp.is_null() {                                 // Vérification que le pointeur MLP n'est pas nul
-            Box::from_raw(mlp);                              // Désallocation de la mémoire en convertissant le pointeur brut en boîte
+        if !mlp.is_null() {
+            // Utilisation d'un soulignement pour ignorer la valeur de retour de Box::from_raw(mlp)
+            let _ = Box::from_raw(mlp);
         }
     }
 }
+
