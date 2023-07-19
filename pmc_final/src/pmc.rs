@@ -165,7 +165,6 @@ pub extern "C" fn propagate(mlp: *mut MLP, inputs: *const f64, is_classification
 pub extern "C" fn predict(mlp: *mut MLP, inputs: *const f64, _inputs_size: i32, is_classification: bool, output: *mut f64, outputs_size: i32) {
     unsafe {
         propagate(mlp, inputs, is_classification);
-
         // Copie des sorties dans le tableau de sortie
         for i in 0..outputs_size {
             *output.offset(i as isize) = (*mlp).x[(*mlp).l as usize][i as usize];
@@ -200,17 +199,18 @@ pub extern "C" fn train(mlp: *mut MLP, samples_inputs: *const f64, samples_expec
                 }
             }
 
-            for j in (0..(*mlp).l as usize).rev() {
-                for k in 0..(*mlp).d[j] as usize {
+            for j in (0..(*mlp).l as usize - 1).rev() {
+                for k in 0..(*mlp).d[j + 1] as usize {
                     let mut sum = 0.0;
 
-                    for l in 0..(*mlp).d[j + 1] as usize {
-                        sum += (*mlp).w[j][l][k] * (*mlp).deltas[j + 1][l];
+                    for l in 0..(*mlp).d[j + 2] as usize {
+                        sum += (*mlp).w[j + 1][l][k] * (*mlp).deltas[j + 1][l];
                     }
 
                     (*mlp).deltas[j][k] = sum * (*mlp).x[j + 1][k] * (1.0 - (*mlp).x[j + 1][k]);
                 }
             }
+
 
             for j in 0..(*mlp).l as usize {
                 for k in 0..(*mlp).d[j + 1] as usize {
