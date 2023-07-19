@@ -2,6 +2,8 @@ use std::fs::File;                                        // Importation du modu
 use std::io::prelude::*;                                  // Importation du module io pour les opérations d'entrée/sortie
 use std::io::BufReader;                                   // Importation du module BufReader pour la lecture de fichiers ligne par ligne
 
+
+
 pub struct MLP {
     d: Vec<i32>,                                          // Vecteur représentant les dimensions des couches du MLP
     l: i32,                                              // Nombre de couches du MLP (longueur du vecteur d)
@@ -158,6 +160,19 @@ pub extern "C" fn propagate(mlp: *mut MLP, inputs: *const f64, is_classification
         }
     }
 }
+
+#[no_mangle]
+pub extern "C" fn predict(mlp: *mut MLP, inputs: *const f64, _inputs_size: i32, is_classification: bool, output: *mut f64, outputs_size: i32) {
+    unsafe {
+        propagate(mlp, inputs, is_classification);
+
+        // Copie des sorties dans le tableau de sortie
+        for i in 0..outputs_size {
+            *output.offset(i as isize) = (*mlp).x[(*mlp).l as usize][i as usize];
+        }
+    }
+}
+
 
 #[no_mangle]
 pub extern "C" fn train(mlp: *mut MLP, samples_inputs: *const f64, samples_expected_outputs: *const f64,
