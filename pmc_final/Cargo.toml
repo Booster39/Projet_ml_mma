@@ -9,4 +9,4 @@ rand = "0.8"
 
 [lib]
 crate-type = ["cdylib"]
-path = "src/pmc.rs"
+path = "../src/pmc.rs"

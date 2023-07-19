@@ -162,7 +162,7 @@ pub extern "C" fn propagate(mlp: *mut MLP, inputs: *const f64, is_classification
 }
 
 #[no_mangle]
-pub extern "C" fn predict(mlp: *mut MLP, inputs: *const f64, _inputs_size: i32, is_classification: bool, output: *mut f64, outputs_size: i32) {
+pub extern "C" fn predict_pmc(mlp: *mut MLP, inputs: *const f64, _inputs_size: i32, is_classification: bool, output: *mut f64, outputs_size: i32) {
     unsafe {
         propagate(mlp, inputs, is_classification);
         // Copie des sorties dans le tableau de sortie
@@ -174,9 +174,9 @@ pub extern "C" fn predict(mlp: *mut MLP, inputs: *const f64, _inputs_size: i32, 
 
 
 #[no_mangle]
-pub extern "C" fn train(mlp: *mut MLP, samples_inputs: *const f64, samples_expected_outputs: *const f64,
-                        samples_size: i32, inputs_size: i32, outputs_size: i32,
-                        is_classification: bool, iteration_count: i32, alpha: f64) {
+pub extern "C" fn train_pmc(mlp: *mut MLP, samples_inputs: *const f64, samples_expected_outputs: *const f64,
+                            samples_size: i32, inputs_size: i32, outputs_size: i32,
+                            is_classification: bool, iteration_count: i32, alpha: f64) {
     unsafe {
         let mut loss = 0.0;
         let mut accuracy = 0.0;
