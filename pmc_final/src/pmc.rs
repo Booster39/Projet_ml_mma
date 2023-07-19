@@ -204,12 +204,13 @@ pub extern "C" fn train(mlp: *mut MLP, samples_inputs: *const f64, samples_expec
                     let mut sum = 0.0;
 
                     for l in 0..(*mlp).d[j + 2] as usize {
-                        sum += (*mlp).w[j + 1][l][k] * (*mlp).deltas[j + 1][l];
+                        sum += (*mlp).w[j + 1][l][k] * (*mlp).deltas[j + 2][l]; // Corrected index here
                     }
 
                     (*mlp).deltas[j][k] = sum * (*mlp).x[j + 1][k] * (1.0 - (*mlp).x[j + 1][k]);
                 }
             }
+
 
 
             for j in 0..(*mlp).l as usize {
