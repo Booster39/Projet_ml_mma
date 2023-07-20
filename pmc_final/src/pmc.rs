@@ -174,12 +174,13 @@ pub extern "C" fn predict_pmc(mlp: *mut MLP, inputs: *const f64, _inputs_size: i
 
 
 #[no_mangle]
-pub extern "C" fn train_pmc(mlp: *mut MLP, samples_inputs: *const f64, samples_expected_outputs: *const f64,
-                            samples_size: i32, inputs_size: i32, outputs_size: i32,
-                            is_classification: bool, iteration_count: i32, alpha: f64) {
+pub extern "C" fn train(mlp: *mut MLP, samples_inputs: *const f64, samples_expected_outputs: *const f64,
+                        samples_size: i32, inputs_size: i32, outputs_size: i32,
+                        is_classification: bool, iteration_count: i32, alpha: f64) {
     unsafe {
         let mut loss = 0.0;
         let mut accuracy = 0.0;
+        let mut best_accuracy = 0.0; // Variable pour conserver la meilleure précision
 
         for i in 0..iteration_count {
             let index = (rand::random::<usize>() % samples_size as usize) as usize;
@@ -228,15 +229,23 @@ pub extern "C" fn train_pmc(mlp: *mut MLP, samples_inputs: *const f64, samples_e
             if i % 500 == 0 {
                 loss = loss / (outputs_size as f64 * 500.0);
                 accuracy = accuracy / (outputs_size as f64 * 500.0);
-                println!("Iteration {}: Loss = {:.4}, Accuracy = {:.2}%", i, loss, accuracy * 100.0);
+
+                // Mise à jour de la meilleure précision atteinte
+                if accuracy > best_accuracy {
+                    best_accuracy = accuracy;
+                }
+
+                // Réinitialiser la perte et l'exactitude pour le prochain lot de 500 itérations
                 loss = 0.0;
                 accuracy = 0.0;
             }
         }
+
+        println!("Meilleure précision atteinte : {:.2}%", best_accuracy * 100.0);
+
         saveModel(mlp);
     }
 }
-
 
 #[no_mangle]
 pub extern "C" fn deleteMLP(mlp: *mut MLP) {
