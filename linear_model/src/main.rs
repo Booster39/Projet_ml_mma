@@ -10,13 +10,6 @@ impl Perceptron {
         Perceptron { weights }
     }
 
-    fn _activation_function(&self, value: f64) -> f64 {
-        if value >= 0.0 {
-            1.0
-        } else {
-            0.0
-        }
-    }
 
     fn train(&mut self, inputs: &[Vec<f64>], targets: &[f64], num_iterations: usize) {
         let learning_rate = 0.01;
